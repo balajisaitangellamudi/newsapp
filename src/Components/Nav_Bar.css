@@ -1,0 +1,8 @@
+.navbar-brand {
+  font-family: "Courier New", Courier, monospace;
+  font-weight: bold;
+}
+
+.navbar-nav .nav-link {
+  font-family: "Your Font Family", sans-serif;
+}
