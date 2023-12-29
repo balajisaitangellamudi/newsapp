@@ -1,5 +1,4 @@
-// News.js
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import NewsCards from "./NewsCards";
 import Shimmer from "./Shimmer/Shimmer";
 
@@ -8,6 +7,15 @@ const News = ({ country, PageSize, category, apikey }) => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalArticles, setTotalArticles] = useState(0);
+
+  // Creating filter
+  const countryRef = useRef("in");
+  const sourceNamesRef = useRef(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    updateNews();
+  };
 
   const handleNextClick = () => {
     setPage((prevPage) => prevPage + 1);
@@ -19,27 +27,36 @@ const News = ({ country, PageSize, category, apikey }) => {
     updateNews();
   };
 
-  const fetchMoreData = () => {
-    updateNews();
-  };
-
   const updateNews = async () => {
     setLoading(true);
 
     try {
-      const url = `https://newsapi.org/v2/top-headlines?&country=${country}&category=${category}&apiKey=${apikey}&page=${page}&pageSize=${PageSize}`;
+      const countryValue = countryRef.current.value;
+      const sourceNamesValue = sourceNamesRef.current.value;
+
+      const url = `https://newsapi.org/v2/top-headlines?&country=${countryValue}&category=${category}&apiKey=${apikey}&page=${page}&pageSize=${PageSize}`;
       const response = await fetch(url);
       const jsonData = await response.json();
+      console.log(jsonData);
 
-      console.log("jsonData:", jsonData); // Log the data
+      // Filter articles based on form data
+      const filteredArticles = jsonData.articles.filter((article) => {
+        return (
+          (!sourceNamesValue ||
+            article.source.name
+              .toLowerCase()
+              .includes(sourceNamesValue.toLowerCase())) &&
+          true
+        );
+      });
 
       setArticles((prevArticles) =>
         page === 1
-          ? [...jsonData.articles]
-          : [...prevArticles, ...jsonData.articles]
+          ? [...filteredArticles]
+          : [...prevArticles, ...filteredArticles]
       );
 
-      setTotalArticles(jsonData.totalResults);
+      setTotalArticles(filteredArticles.length);
     } catch (error) {
       console.error("Error while fetching the data", error);
     }
@@ -57,6 +74,17 @@ const News = ({ country, PageSize, category, apikey }) => {
       {loading && <Shimmer />}
 
       <div className="container">
+        <div>
+          <form onSubmit={handleSubmit}>
+            <input type="text" ref={countryRef} placeholder="Country" />
+            <input
+              type="text"
+              ref={sourceNamesRef}
+              placeholder="Source Names"
+            />
+            <button type="submit">Submit</button>
+          </form>
+        </div>
         <div className="row row-cols-1 row-cols-md-3 g-3">
           {!loading &&
             articles.map((element, index) => {
@@ -77,7 +105,7 @@ const News = ({ country, PageSize, category, apikey }) => {
                       newsUrl={element.url}
                       author={element.author}
                       date={element.publishedAt}
-                      Source={element.author}
+                      Source={element.source.name}
                     />
                   </div>
                 );

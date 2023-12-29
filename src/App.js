@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./Components/Nav_Bar";
 import News from "./Components/News";
 
@@ -13,7 +13,6 @@ const App = () => {
         <div>
           <Routes>
             <Route
-              exact
               path="/"
               element={
                 <News
@@ -26,7 +25,6 @@ const App = () => {
               }
             />
             <Route
-              exact
               path="/business"
               element={
                 <News
@@ -39,7 +37,6 @@ const App = () => {
               }
             />
             <Route
-              exact
               path="/entertainment"
               element={
                 <News
@@ -52,7 +49,6 @@ const App = () => {
               }
             />
             <Route
-              exact
               path="/health"
               element={
                 <News
@@ -65,7 +61,6 @@ const App = () => {
               }
             />
             <Route
-              exact
               path="/science"
               element={
                 <News
@@ -78,7 +73,6 @@ const App = () => {
               }
             />
             <Route
-              exact
               path="/sports"
               element={
                 <News
@@ -91,7 +85,6 @@ const App = () => {
               }
             />
             <Route
-              exact
               path="/technology"
               element={
                 <News

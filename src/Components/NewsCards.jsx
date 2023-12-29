@@ -21,3 +21,4 @@ const NewsCards = ({ title, description, imageUrl, newsUrl }) => {
 };
 
 export default NewsCards;
+
