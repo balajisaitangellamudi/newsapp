@@ -18,13 +18,11 @@ const News = ({ country, PageSize, category, apikey }) => {
   };
 
   const handleNextClick = () => {
-    setPage((prevPage) => prevPage + 1);
-    updateNews();
+    setPage((page) => page + 1);
   };
 
   const handlePrevClick = () => {
-    setPage((prevPage) => Math.max(prevPage - 1, 1));
-    updateNews();
+    setPage((page) => Math.max(page - 1, 1));
   };
 
   const updateNews = async () => {
@@ -41,19 +39,17 @@ const News = ({ country, PageSize, category, apikey }) => {
 
       // Filter articles based on form data
       const filteredArticles = jsonData.articles.filter((article) => {
+        // console.log(article, "filtered articles");
         return (
           (!sourceNamesValue ||
-            article.source.name
-              .toLowerCase()
-              .includes(sourceNamesValue.toLowerCase())) &&
+            article.source.name.toLowerCase().split(" ").join("") ===
+              sourceNamesValue.toLowerCase().split(" ").join("")) &&
           true
         );
       });
 
-      setArticles((prevArticles) =>
-        page === 1
-          ? [...filteredArticles]
-          : [...prevArticles, ...filteredArticles]
+      setArticles((articles) =>
+        page === 1 ? [...filteredArticles] : [...articles, ...filteredArticles]
       );
 
       setTotalArticles(filteredArticles.length);
@@ -67,7 +63,7 @@ const News = ({ country, PageSize, category, apikey }) => {
   useEffect(() => {
     document.title = `${category} - Brief`;
     updateNews();
-  }, [category, country, PageSize, apikey, page]);
+  }, [category, country, PageSize, apikey, page, countryRef]);
 
   return (
     <div className="container my-3">
@@ -91,7 +87,12 @@ const News = ({ country, PageSize, category, apikey }) => {
               const startIndex = (page - 1) * PageSize;
               const endIndex = startIndex + PageSize;
 
-              if (index >= startIndex && index < endIndex) {
+              if (
+                element &&
+                element.title &&
+                index >= startIndex &&
+                index < endIndex
+              ) {
                 return (
                   <div className="col-md-4 mb-3" key={element.url}>
                     <NewsCards
@@ -105,7 +106,7 @@ const News = ({ country, PageSize, category, apikey }) => {
                       newsUrl={element.url}
                       author={element.author}
                       date={element.publishedAt}
-                      Source={element.source.name}
+                      Source={element.source?.name}
                     />
                   </div>
                 );
@@ -117,18 +118,18 @@ const News = ({ country, PageSize, category, apikey }) => {
 
       <div className="container d-flex justify-content-between">
         <button
-          disabled={page <= 1}
           type="button"
           className="btn btn-secondary"
           onClick={handlePrevClick}
+          disabled={page === 1}
         >
           Previous
         </button>
         <button
-          disabled={page * PageSize >= totalArticles}
           type="button"
           className="btn btn-secondary"
           onClick={handleNextClick}
+          disabled={page === 9} // Adjust the number according to your total number of pages
         >
           Next
         </button>
